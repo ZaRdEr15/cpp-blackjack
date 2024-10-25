@@ -43,8 +43,8 @@ namespace Blackjack {
     class Game {
         std::vector<Card> m_deck;
 
-        Player m_player;
-        Dealer m_dealer;
+        /* Player m_player;
+        Dealer m_dealer; */
 
         void fillDeck();
         void shuffleDeck(std::default_random_engine rng);
