@@ -9,13 +9,13 @@ namespace Blackjack {
         auto rd {std::random_device {}};
         auto rng {std::default_random_engine { rd() }};
         fillDeck();
-        //showDeck(); // DEBUG
         shuffleDeck(rng);
-        Player player {takeCard(), takeCard()};
-        player.showCards();
+        Player player {initialDeal()};
+        //showDeck(); // DEBUG
     }
 
     void Game::fillDeck() {
+        if (!deck.empty()) { deck.clear(); }
         std::array<std::string, SUITS> suits {"♣", "♦", "♥", "♠"};
         std::array<std::string, SUIT_SIZE> single_suit_faces {
             "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
@@ -33,9 +33,15 @@ namespace Blackjack {
     }
 
     void Game::showDeck() {
+        std::cout << "Deck (" << deck.size() << "):" << '\n';
         for (const auto& card : deck) {
             std::cout << card.face << card.suit << '\n';
         }
+    }
+
+    std::vector<Card> Game::initialDeal() {
+        std::vector<Card> initial_hand {takeCard(), takeCard()};
+        return initial_hand;
     }
 
     Card Game::takeCard() {
@@ -61,15 +67,16 @@ namespace Blackjack {
         }
     }
 
-    HandHolder::HandHolder(Card first_card, Card second_card) {
-        hand.push_back(first_card);
-        hand.push_back(second_card);
+    HandHolder::HandHolder(std::vector<Card> initial_hand) {
+        hand = initial_hand;
         finished = false;
         calculateTotalValue();
     }
 
     void HandHolder::hit() {
-        //takeCard();
+        Card new_card {Game::takeCard()};
+        hand.push_back(new_card);
+        total_value += new_card.value;
     }
 
     void HandHolder::stand() {
@@ -84,7 +91,7 @@ namespace Blackjack {
     
     void HandHolder::showCards() {}
 
-    Player::Player(Card first_card, Card second_card) : HandHolder(first_card, second_card) {}
+    Player::Player(std::vector<Card> initial_hand) : HandHolder(initial_hand) {}
 
     void Player::showCards() {
         std::cout << "Player hand (" << total_value << "):" << '\n';
