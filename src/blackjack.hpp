@@ -32,10 +32,12 @@ namespace Blackjack {
 
     class Player : HandHolder {
     public:
-        std::vector<std::vector<Card>> additional_hands;
+        //std::vector<std::vector<Card>> additional_hands;
 
-        void doubleDown(); // increase bet by 100% and take exactly one card, then stand
-        void split(); // split cards into two separate hands
+        Player(Card first_card, Card second_card);
+        //void doubleDown(); // increase bet by 100% and take exactly one card, then stand
+        //void split(); // split cards into two separate hands
+        void showCards() override;
         void chooseAction();
     };
 

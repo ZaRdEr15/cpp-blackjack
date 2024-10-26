@@ -11,7 +11,7 @@ namespace Blackjack {
         fillDeck();
         //showDeck(); // DEBUG
         shuffleDeck(rng);
-        HandHolder player {takeCard(), takeCard()};
+        Player player {takeCard(), takeCard()};
         player.showCards();
     }
 
@@ -81,9 +81,13 @@ namespace Blackjack {
             total_value += card.value;
         }
     }
+    
+    void HandHolder::showCards() {}
 
-    void HandHolder::showCards() {
-        std::cout << "HandHolder hand (" << total_value << "):" << '\n';
+    Player::Player(Card first_card, Card second_card) : HandHolder(first_card, second_card) {}
+
+    void Player::showCards() {
+        std::cout << "Player hand (" << total_value << "):" << '\n';
         for (const auto& card : hand) {
             std::cout << card.face << card.suit << '\n';
         }
