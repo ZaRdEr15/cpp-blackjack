@@ -12,6 +12,7 @@ namespace Blackjack {
         std::string face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
         std::string suit;      // ♣♦♥♠ (purely aesthetic)
         bool ace;       // false by default
+
         Card(const std::string f, const std::string s);
         void faceToValue(const std::string f);
     };
@@ -19,7 +20,10 @@ namespace Blackjack {
     class HandHolder {
     public:
         std::vector<Card> hand;
+        int total_value;
         bool finished;
+
+        HandHolder(Card first_card, Card second_card);
         void hit();
         void stand();
         virtual void calculateTotalValue();
@@ -28,9 +32,10 @@ namespace Blackjack {
 
     class Player : HandHolder {
     public:
-        void showCards() override; // shows all cards
+        std::vector<std::vector<Card>> additional_hands;
+
         void doubleDown(); // increase bet by 100% and take exactly one card, then stand
-        void split();
+        void split(); // split cards into two separate hands
         void chooseAction();
     };
 
@@ -41,17 +46,13 @@ namespace Blackjack {
     };
 
     class Game {
-        std::vector<Card> m_deck;
-
-        /* Player m_player;
-        Dealer m_dealer; */
-
-        void fillDeck();
-        void shuffleDeck(std::default_random_engine rng);
-        void showDeck();
         void initialDeal();
         void decideWinner();
     public:
         void play();
+        void fillDeck();
+        void shuffleDeck(std::default_random_engine rng);
+        void showDeck();
+        Card takeCard();
     };
 }

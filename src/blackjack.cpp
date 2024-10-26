@@ -3,12 +3,16 @@
 
 namespace Blackjack {
 
+    std::vector<Card> deck;
+
     void Game::play() {
         auto rd {std::random_device {}};
         auto rng {std::default_random_engine { rd() }};
         fillDeck();
         //showDeck(); // DEBUG
         shuffleDeck(rng);
+        HandHolder player {takeCard(), takeCard()};
+        player.showCards();
     }
 
     void Game::fillDeck() {
@@ -19,19 +23,25 @@ namespace Blackjack {
         for (const auto& suit : suits) {
             for (const auto& face : single_suit_faces) {
                 Card card {face, suit};
-                m_deck.push_back(card);
+                deck.push_back(card);
             }
         }
     }
 
     void Game::shuffleDeck(std::default_random_engine rng) {
-        std::shuffle(std::begin(m_deck), std::end(m_deck), rng);
+        std::shuffle(std::begin(deck), std::end(deck), rng);
     }
 
     void Game::showDeck() {
-        for (const auto& card : m_deck) {
+        for (const auto& card : deck) {
             std::cout << card.face << card.suit << '\n';
         }
+    }
+
+    Card Game::takeCard() {
+        Card card {deck.back()};
+        deck.pop_back();
+        return card;
     }
 
     Card::Card(const std::string f, const std::string s) {
@@ -48,6 +58,34 @@ namespace Blackjack {
             value = 11;
         } else {
             value = f[0] - 48;
+        }
+    }
+
+    HandHolder::HandHolder(Card first_card, Card second_card) {
+        hand.push_back(first_card);
+        hand.push_back(second_card);
+        finished = false;
+        calculateTotalValue();
+    }
+
+    void HandHolder::hit() {
+        //takeCard();
+    }
+
+    void HandHolder::stand() {
+
+    }
+
+    void HandHolder::calculateTotalValue() {
+        for (const auto& card : hand) {
+            total_value += card.value;
+        }
+    }
+
+    void HandHolder::showCards() {
+        std::cout << "HandHolder hand (" << total_value << "):" << '\n';
+        for (const auto& card : hand) {
+            std::cout << card.face << card.suit << '\n';
         }
     }
 }
