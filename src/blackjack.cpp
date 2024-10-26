@@ -13,6 +13,7 @@ namespace Blackjack {
         Card card1 {"A", "♣"};
         std::vector<Card> initial_hand {card1, card1};
         Player player {initial_hand}; // initialDeal()
+        player.hit();
         player.showCards();
         //showDeck(); // DEBUG
     }
@@ -79,11 +80,17 @@ namespace Blackjack {
     void HandHolder::hit() {
         Card new_card {Game::takeCard()};
         hand.push_back(new_card);
-        total_value += new_card.value;
+        total_value += new_card.face == "A" && hasAce() ? 1 : new_card.value;
     }
 
     void HandHolder::stand() {
 
+    }
+
+    bool HandHolder::hasAce() {
+        return std::any_of(hand.begin(), hand.end(), [](const Card& card) {
+            return card.face == "A";
+        });
     }
 
     void HandHolder::calculateTotalValue() {

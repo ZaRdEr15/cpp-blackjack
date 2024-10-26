@@ -26,6 +26,7 @@ namespace Blackjack {
         HandHolder(std::vector<Card> initial_hand);
         void hit();
         void stand();
+        bool hasAce();
         virtual void calculateTotalValue();
         virtual void showCards();
     };
