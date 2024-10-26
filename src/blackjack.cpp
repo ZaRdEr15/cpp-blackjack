@@ -10,7 +10,10 @@ namespace Blackjack {
         auto rng {std::default_random_engine { rd() }};
         fillDeck();
         shuffleDeck(rng);
-        Player player {initialDeal()};
+        Card card1 {"A", "♣"};
+        std::vector<Card> initial_hand {card1, card1};
+        Player player {initial_hand}; // initialDeal()
+        player.showCards();
         //showDeck(); // DEBUG
     }
 
@@ -51,7 +54,6 @@ namespace Blackjack {
     }
 
     Card::Card(const std::string f, const std::string s) {
-        ace = f == "A" ? true : false;
         face = f;
         suit = s;
         faceToValue(f);
@@ -70,6 +72,7 @@ namespace Blackjack {
     HandHolder::HandHolder(std::vector<Card> initial_hand) {
         hand = initial_hand;
         finished = false;
+        total_value = 0;
         calculateTotalValue();
     }
 
@@ -87,6 +90,7 @@ namespace Blackjack {
         for (const auto& card : hand) {
             total_value += card.value;
         }
+        total_value -= total_value > BLACKJACK ? 10 : 0;
     }
     
     void HandHolder::showCards() {}

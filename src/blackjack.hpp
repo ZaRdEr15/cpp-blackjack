@@ -4,6 +4,7 @@
 
 #define SUITS 4
 #define SUIT_SIZE 13
+#define BLACKJACK 21
 
 namespace Blackjack {
 
@@ -11,7 +12,6 @@ namespace Blackjack {
         int value;  // from 2 to 11
         std::string face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
         std::string suit;      // ♣♦♥♠ (purely aesthetic)
-        bool ace;       // false by default
 
         Card(const std::string f, const std::string s);
         void faceToValue(const std::string f);
