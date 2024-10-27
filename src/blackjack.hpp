@@ -27,7 +27,7 @@ namespace Blackjack {
         void hit();
         void stand();
         bool hasAce();
-        virtual void calculateTotalValue();
+        void calculateTotalValue();
         virtual void showCards();
     };
 
@@ -36,7 +36,7 @@ namespace Blackjack {
         //std::vector<std::vector<Card>> additional_hands;
 
         Player(std::vector<Card> initial_hand);
-        //void doubleDown(); // increase bet by 100% and take exactly one card, then stand
+        void doubleDown(); // increase bet by 100% and take exactly one card, then stand
         //void split(); // split cards into two separate hands
         void showCards() override;
         void chooseAction();
@@ -44,7 +44,6 @@ namespace Blackjack {
 
     class Dealer : public HandHolder { // stands on 17 and higher (no matter what)
     public:
-        void calculateTotalValue() override;
         void showCards() override; // shows 1 card before player finished and all after finished
     };
 

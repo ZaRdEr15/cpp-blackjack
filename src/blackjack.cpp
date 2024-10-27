@@ -10,12 +10,8 @@ namespace Blackjack {
         auto rng {std::default_random_engine { rd() }};
         fillDeck();
         shuffleDeck(rng);
-        Card card1 {"A", "♣"};
-        std::vector<Card> initial_hand {card1, card1};
-        Player player {initial_hand}; // initialDeal()
-        player.hit();
+        Player player {initialDeal()};
         player.showCards();
-        //showDeck(); // DEBUG
     }
 
     void Game::fillDeck() {
@@ -81,6 +77,10 @@ namespace Blackjack {
         Card new_card {Game::takeCard()};
         hand.push_back(new_card);
         total_value += new_card.face == "A" && hasAce() ? 1 : new_card.value;
+        if (total_value > BLACKJACK) {
+            finished = true;
+            std::cout << "Over 21!" << '\n';
+        }
     }
 
     void HandHolder::stand() {
