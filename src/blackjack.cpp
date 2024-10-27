@@ -12,6 +12,7 @@ namespace Blackjack {
         shuffleDeck(rng);
         Player player {initialDeal()};
         player.showCards();
+        player.chooseAction();
     }
 
     void Game::fillDeck() {
@@ -84,7 +85,7 @@ namespace Blackjack {
     }
 
     void HandHolder::stand() {
-
+        finished = true;
     }
 
     bool HandHolder::hasAce() {
@@ -104,10 +105,44 @@ namespace Blackjack {
 
     Player::Player(std::vector<Card> initial_hand) : HandHolder(initial_hand) {}
 
+    void Player::doubleDown() {
+        hit();
+        finished = true;
+    }
+
+    void Player::split() {
+
+    }
+
     void Player::showCards() {
         std::cout << "Player hand (" << total_value << "):" << '\n';
         for (const auto& card : hand) {
             std::cout << card.face << card.suit << '\n';
+        }
+    }
+
+    void Player::chooseAction() {
+        while (!finished) {
+            char action;
+            std::cout << "Choose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
+            std::cin >> action;
+            switch (action) {
+                case 'h':
+                    hit();
+                    break;
+                case 's':
+                    stand();
+                    break;
+                case 'd':
+                    doubleDown();
+                    break;
+                case 'p':
+                    split();
+                    break;
+                default:
+                    std::cout << "Incorrect input! Try again.\n";
+                    continue;
+            }
         }
     }
 }

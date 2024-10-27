@@ -36,8 +36,8 @@ namespace Blackjack {
         //std::vector<std::vector<Card>> additional_hands;
 
         Player(std::vector<Card> initial_hand);
-        void doubleDown(); // increase bet by 100% and take exactly one card, then stand
-        //void split(); // split cards into two separate hands
+        void doubleDown();  // increase bet by 100% and take exactly one card, then stand
+        void split();       // split cards into two separate hands
         void showCards() override;
         void chooseAction();
     };
