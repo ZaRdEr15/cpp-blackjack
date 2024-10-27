@@ -5,6 +5,7 @@
 #define SUITS 4
 #define SUIT_SIZE 13
 #define BLACKJACK 21
+#define DEALER_STAND 17
 
 namespace Blackjack {
 
@@ -44,17 +45,19 @@ namespace Blackjack {
 
     class Dealer : public HandHolder { // stands on 17 and higher (no matter what)
     public:
+        Dealer(std::vector<Card> initial_hand);
+        void playHand();
         void showCards() override; // shows 1 card before player finished and all after finished
     };
 
     class Game {
         std::vector<Card> initialDeal();
-        void decideWinner();
-    public:
-        void play();
         void fillDeck();
         void shuffleDeck(std::default_random_engine rng);
         void showDeck();
+        void decideWinner(const Player& player, const Dealer& dealer);
+    public:
+        void play();
         static Card takeCard(); // take a card from the deck, lowering it
     };
 }

@@ -11,8 +11,13 @@ namespace Blackjack {
         fillDeck();
         shuffleDeck(rng);
         Player player {initialDeal()};
+        Dealer dealer {initialDeal()};
+        dealer.showCards();
         player.showCards();
         player.chooseAction();
+        dealer.playHand();
+        dealer.showCards();
+        decideWinner(player, dealer);
     }
 
     void Game::fillDeck() {
@@ -37,6 +42,20 @@ namespace Blackjack {
         std::cout << "Deck (" << deck.size() << "):" << '\n';
         for (const auto& card : deck) {
             std::cout << card.face << card.suit << '\n';
+        }
+    }
+
+    void Game::decideWinner(const Player& player, const Dealer& dealer) {
+        if (player.total_value > BLACKJACK) {
+            std::cout << "Dealer won! Player is over 21.\n";
+        } else if (dealer.total_value > BLACKJACK) {
+            std::cout << "Player won! Dealer is over 21.\n";
+        } else if (player.total_value > dealer.total_value) {
+            std::cout << "Player won!\n";
+        } else if (dealer.total_value > player.total_value) {
+            std::cout << "Dealer won!\n";
+        } else if (player.total_value == dealer.total_value) {
+            std::cout << "Draw!\n";
         }
     }
 
@@ -80,7 +99,6 @@ namespace Blackjack {
         total_value += new_card.face == "A" && hasAce() ? 1 : new_card.value;
         if (total_value > BLACKJACK) {
             finished = true;
-            std::cout << "Over 21!" << '\n';
         }
     }
 
@@ -115,7 +133,7 @@ namespace Blackjack {
     }
 
     void Player::showCards() {
-        std::cout << "Player hand (" << total_value << "):" << '\n';
+        std::cout << "Player hand (" << total_value << "):\n";
         for (const auto& card : hand) {
             std::cout << card.face << card.suit << '\n';
         }
@@ -129,12 +147,15 @@ namespace Blackjack {
             switch (action) {
                 case 'h':
                     hit();
+                    showCards();
                     break;
                 case 's':
                     stand();
+                    showCards();
                     break;
                 case 'd':
                     doubleDown();
+                    showCards();
                     break;
                 case 'p':
                     split();
@@ -142,6 +163,31 @@ namespace Blackjack {
                 default:
                     std::cout << "Incorrect input! Try again.\n";
                     continue;
+            }
+        }
+    }
+
+    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder(initial_hand) {}
+
+    void Dealer::playHand() {
+        while (!finished) {
+            if (total_value < DEALER_STAND) {
+                hit();
+            } else {
+                stand();
+            }
+        }
+    }
+
+    void Dealer::showCards() {
+        if (!finished) {
+            std::cout << "Dealer hand:" << '\n';
+            std::cout << hand[0].face << hand[0].suit << '\n';
+            std::cout << "X" << '\n';
+        } else {
+            std::cout << "Dealer hand (" << total_value << "):\n";
+            for (const auto& card : hand) {
+                std::cout << card.face << card.suit << '\n';
             }
         }
     }
