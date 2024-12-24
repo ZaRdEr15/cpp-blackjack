@@ -3,6 +3,11 @@
 
 namespace Blackjack {
 
+    constexpr int SUITS {4};
+    constexpr int SUIT_SIZE {13};
+    constexpr int BLACKJACK {21};
+    constexpr int DEALER_STAND {17};
+
     std::vector<Card> deck;
 
     void Game::play() {

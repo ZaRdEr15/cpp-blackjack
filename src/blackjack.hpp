@@ -2,11 +2,6 @@
 #include <algorithm>
 #include <random>
 
-#define SUITS 4
-#define SUIT_SIZE 13
-#define BLACKJACK 21
-#define DEALER_STAND 17
-
 namespace Blackjack {
 
     struct Card {
@@ -58,6 +53,6 @@ namespace Blackjack {
         void decideWinner(const Player& player, const Dealer& dealer);
     public:
         void play();
-        static Card takeCard(); // take a card from the deck, lowering it
+        static Card takeCard(); // take a card from the deck, lowering deck count
     };
 }
