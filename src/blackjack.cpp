@@ -1,4 +1,5 @@
 #include <iostream>
+#include <array>
 #include "blackjack.hpp"
 
 namespace Blackjack {

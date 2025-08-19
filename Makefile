@@ -1,5 +1,5 @@
 CXX          := g++
-CXXFLAGS     := -pedantic-errors -Wall -Wextra -Werror
+CXXFLAGS     := -pedantic-errors -Wall -Wextra -Werror -std=c++17
 BUILD        := ./build
 INCLUDE      := -Isrc
 SRC          := $(wildcard src/*.cpp)
