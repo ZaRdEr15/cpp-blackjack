@@ -18,7 +18,7 @@ namespace Blackjack {
     }
 
     HandHolder::HandHolder(std::vector<Card> initial_hand) :
-        hand {initial_hand}, total_value {0}, finished {false}  {
+        total_value {0}, hand {initial_hand}, finished {false}  {
         calculateTotalValue();
     }
 
@@ -98,7 +98,7 @@ namespace Blackjack {
         // not implemented yet
     }
 
-    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}
+    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand}, show_once {true} {}
 
     void Dealer::playHand(const int& player_total, Game& game_instance) {
         if (player_total > Blackjack) {
@@ -111,11 +111,13 @@ namespace Blackjack {
     }
 
     void Dealer::showCards() {
-        if (!finished) {
+        if (!finished && show_once) {
+            show_once = false;
             std::cout << "Dealer hand:" << '\n'
                       << hand[0].face << hand[0].suit << '\n'
                       << "X" << '\n';
         } else {
+            show_once = true;
             std::cout << "Dealer hand (" << total_value << "):\n";
             for (const auto& card : hand) {
                 std::cout << card.face << card.suit << '\n';

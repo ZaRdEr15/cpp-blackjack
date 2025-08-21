@@ -67,6 +67,8 @@ namespace Blackjack {
         Dealer(std::vector<Card> initial_hand);
         void playHand(const int& player_total, Game& game_instance);
         void showCards() override; // shows 1 card before player finished and all after finished
+    private:
+        bool show_once; // show cards CARD - X even if 21 or after game won/lost first round
     };
 
     class Game {
