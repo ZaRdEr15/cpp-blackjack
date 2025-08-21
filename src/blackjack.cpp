@@ -22,6 +22,8 @@ namespace Blackjack {
         calculateTotalValue();
     }
 
+    HandHolder::~HandHolder() {}
+
     void HandHolder::showCards() {}
 
     void HandHolder::hit(Game& game_instance) {

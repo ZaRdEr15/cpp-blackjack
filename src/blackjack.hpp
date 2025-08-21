@@ -33,12 +33,14 @@ namespace Blackjack {
         void faceToValue(std::string_view f);
     };
 
+    // abstract base class
     class HandHolder {
     public:
         int total_value;
 
         HandHolder(std::vector<Card> initial_hand);
-        virtual void showCards();
+        virtual ~HandHolder(); // always include virtual destructor of a base polymorphic class
+        virtual void showCards() = 0; // pure virtual function
     protected:
         std::vector<Card> hand;
         bool finished;
