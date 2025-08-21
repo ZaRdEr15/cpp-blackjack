@@ -22,9 +22,10 @@ namespace Blackjack {
         calculateTotalValue();
     }
 
+    void HandHolder::showCards() {}
+
     void HandHolder::hit(Game& game_instance) {
-        Card new_card {game_instance.takeCard()};
-        hand.push_back(new_card);
+        hand.push_back(game_instance.takeCard());
         calculateTotalValue();
     }
 
@@ -50,19 +51,8 @@ namespace Blackjack {
             finished = true;
         }
     }
-    
-    void HandHolder::showCards() {}
 
     Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}
-
-    void Player::doubleDown(Game& game_instance) {
-        hit(game_instance);
-        finished = true;
-    }
-
-    void Player::split() {
-        // not implemented yet
-    }
 
     void Player::showCards() {
         std::cout << "Player hand (" << total_value << "):\n";
@@ -97,6 +87,15 @@ namespace Blackjack {
                     continue;
             }
         }
+    }
+
+    void Player::doubleDown(Game& game_instance) {
+        hit(game_instance);
+        finished = true;
+    }
+
+    void Player::split() {
+        // not implemented yet
     }
 
     Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}

@@ -17,13 +17,14 @@ namespace Blackjack {
     inline std::mt19937 mt {std::random_device {}()};
 
     // forward declarations
-    struct Card;
+    class Card;
     class HandHolder;
     class Player;
     class Dealer;
     class Game;
 
-    struct Card {
+    class Card {
+    public:
         int value;  // from 1 to 10
         std::string_view face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
         std::string_view suit;      // ♣♦♥♠ (purely aesthetic)
@@ -34,16 +35,19 @@ namespace Blackjack {
 
     class HandHolder {
     public:
-        std::vector<Card> hand;
         int total_value;
-        bool finished;
 
         HandHolder(std::vector<Card> initial_hand);
+        virtual void showCards();
+    protected:
+        std::vector<Card> hand;
+        bool finished;
+
         void hit(Game& game_instance);
         void stand();
+    private:
         bool hasAce();
         void calculateTotalValue();
-        virtual void showCards();
     };
 
     class Player : public HandHolder {
@@ -51,10 +55,11 @@ namespace Blackjack {
         //std::vector<std::vector<Card>> additional_hands;
 
         Player(std::vector<Card> initial_hand);
-        void doubleDown(Game& game_instance);  // increase bet by 100% and take exactly one card, then stand
-        void split();       // split cards into two separate hands
         void showCards() override;
         void chooseAction(Game& game_instance);
+    private:
+        void doubleDown(Game& game_instance);  // increase bet by 100% and take exactly one card, then stand
+        void split();       // split cards into two separate hands
     };
 
     class Dealer : public HandHolder { // stands on 17 and higher (no matter what)
@@ -67,15 +72,16 @@ namespace Blackjack {
     class Game {
     public:
         friend HandHolder;
+
         Game();
         void play();
     private:
         std::vector<Card> deck;
+
         std::vector<Card> initialDeal();
         Card takeCard(); // take a card from the deck, lowering deck count
         void fillDeck();
         void showDeck();
         void decideWinner(const Player& player, const Dealer& dealer);
-    
     };
 }
