@@ -24,8 +24,6 @@ namespace Blackjack {
 
     HandHolder::~HandHolder() {}
 
-    void HandHolder::showCards() {}
-
     void HandHolder::hit(Game& game_instance) {
         hand.push_back(game_instance.takeCard());
         calculateTotalValue();
@@ -155,11 +153,9 @@ namespace Blackjack {
     }
 
     void Game::fillDeck() {
-        if (deck.size() < RefillDeck) {
-            if (deck.size() != 0) {
+        if (deck.size() <= MinDeckSizeBeforeRefill) {
+            if (!deck.empty()) {
                 std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
-            }
-            if (!deck.empty()) { 
                 deck.clear(); 
             }
             for (std::string_view suit : Suit) {

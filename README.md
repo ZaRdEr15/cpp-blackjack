@@ -21,6 +21,7 @@ To stop the application, press CTRL+C to kill the process.
 - [ ] Add betting
 - [ ] Improve visual to make tabular in one row
 - [ ] Make split action operational
+- [ ] Add insurance (only if up card is an ace)
 
 ## License
 Distributed under MIT License. See LICENSE for more information. 

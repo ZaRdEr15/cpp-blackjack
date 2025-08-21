@@ -5,9 +5,9 @@
 
 namespace Blackjack {
 
-    inline constexpr int Blackjack     {21};
-    inline constexpr int DealerStand   {17};
-    inline constexpr int RefillDeck    {52 / 3};
+    inline constexpr int Blackjack {21};
+    inline constexpr int DealerStand {17};
+    inline constexpr int MinDeckSizeBeforeRefill {52 / 3};
 
     inline constexpr std::array<std::string_view, 4> Suit {"♣", "♦", "♥", "♠"};
     inline constexpr std::array<std::string_view, 13> SingleSuitFaces {
