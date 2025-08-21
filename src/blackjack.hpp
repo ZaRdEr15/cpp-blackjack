@@ -14,6 +14,8 @@ namespace Blackjack {
         "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
     };
 
+    inline std::mt19937 mt {std::random_device {}()};
+
     struct Card {
         int value;  // from 1 to 10
         std::string_view face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
@@ -56,8 +58,6 @@ namespace Blackjack {
     };
 
     class Game {
-        std::random_device rd;
-        std::default_random_engine rng;
         std::vector<Card> initialDeal();
         void fillDeck();
         void showDeck();

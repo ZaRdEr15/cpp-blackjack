@@ -30,7 +30,7 @@ namespace Blackjack {
                     deck.push_back(Card {face, suit});
                 }
             }
-            std::shuffle(std::begin(deck), std::end(deck), rng);
+            std::shuffle(std::begin(deck), std::end(deck), mt);
         }
     }
 
@@ -66,7 +66,7 @@ namespace Blackjack {
         return card;
     }
 
-    Game::Game() : rd {}, rng {rd()} {}
+    Game::Game() {}
 
     Card::Card(std::string_view f, std::string_view s) : face {f}, suit {s} {
         faceToValue(f);
