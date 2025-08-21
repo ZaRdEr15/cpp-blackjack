@@ -16,6 +16,13 @@ namespace Blackjack {
 
     inline std::mt19937 mt {std::random_device {}()};
 
+    // forward declarations
+    struct Card;
+    class HandHolder;
+    class Player;
+    class Dealer;
+    class Game;
+
     struct Card {
         int value;  // from 1 to 10
         std::string_view face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
@@ -32,7 +39,7 @@ namespace Blackjack {
         bool finished;
 
         HandHolder(std::vector<Card> initial_hand);
-        void hit();
+        void hit(Game& game_instance);
         void stand();
         bool hasAce();
         void calculateTotalValue();
@@ -44,27 +51,31 @@ namespace Blackjack {
         //std::vector<std::vector<Card>> additional_hands;
 
         Player(std::vector<Card> initial_hand);
-        void doubleDown();  // increase bet by 100% and take exactly one card, then stand
+        void doubleDown(Game& game_instance);  // increase bet by 100% and take exactly one card, then stand
         void split();       // split cards into two separate hands
         void showCards() override;
-        void chooseAction();
+        void chooseAction(Game& game_instance);
     };
 
     class Dealer : public HandHolder { // stands on 17 and higher (no matter what)
     public:
         Dealer(std::vector<Card> initial_hand);
-        void playHand(const int& player_total);
+        void playHand(const int& player_total, Game& game_instance);
         void showCards() override; // shows 1 card before player finished and all after finished
     };
 
     class Game {
+    public:
+        friend HandHolder;
+        Game();
+        void play();
+    private:
+        std::vector<Card> deck;
         std::vector<Card> initialDeal();
+        Card takeCard(); // take a card from the deck, lowering deck count
         void fillDeck();
         void showDeck();
         void decideWinner(const Player& player, const Dealer& dealer);
-    public:
-        Game();
-        void play();
-        static Card takeCard(); // take a card from the deck, lowering deck count
+    
     };
 }
