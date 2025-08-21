@@ -1,17 +1,7 @@
 #include <iostream>
-#include <array>
 #include "blackjack.hpp"
 
 namespace Blackjack {
-
-    constexpr int Blackjack     {21};
-    constexpr int DealerStand   {17};
-    constexpr int RefillDeck    {52 / 3};
-
-    constexpr std::array<std::string_view, 4> Suit {"♣", "♦", "♥", "♠"};
-    constexpr std::array<std::string_view, 13> SingleSuitFaces {
-        "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
-    };
 
     std::vector<Card> deck;
 

@@ -1,8 +1,18 @@
 #pragma once
 #include <algorithm>
 #include <random>
+#include <array>
 
 namespace Blackjack {
+
+    inline constexpr int Blackjack     {21};
+    inline constexpr int DealerStand   {17};
+    inline constexpr int RefillDeck    {52 / 3};
+
+    inline constexpr std::array<std::string_view, 4> Suit {"♣", "♦", "♥", "♠"};
+    inline constexpr std::array<std::string_view, 13> SingleSuitFaces {
+        "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
+    };
 
     struct Card {
         int value;  // from 1 to 10
