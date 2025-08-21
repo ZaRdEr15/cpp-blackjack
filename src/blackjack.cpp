@@ -154,7 +154,7 @@ namespace Blackjack {
 
     void Game::fillDeck() {
         if (deck.size() < RefillDeck) {
-            if (deck.size() == 0) {
+            if (deck.size() != 0) {
                 std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
             }
             if (!deck.empty()) { 
