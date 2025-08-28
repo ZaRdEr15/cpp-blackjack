@@ -25,6 +25,9 @@ $(TARGET): $(OBJECTS)
 build:
 	@if [ ! -d "build" ]; then mkdir -p build; fi
 
+debug: CXXFLAGS += -g -O0
+debug: all
+
 clean:
 	-@rm -rvf $(BUILD)/*
 
