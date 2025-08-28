@@ -75,7 +75,7 @@ namespace Blackjack {
 
     class Game {
     public:
-        friend HandHolder;
+        friend HandHolder; // Gives HandHolder access to takeCard()
 
         Game();
         void play();
