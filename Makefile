@@ -6,7 +6,9 @@ BUILD_DIR    := build
 SRC_DIR      := src
 TEST_DIR     := tests
 
-APP_SRC      := $(wildcard $(SRC_DIR)/*.cpp)
+CXXFLAGS += -I$(SRC_DIR)
+
+APP_SRC      := $(SRC_DIR)/blackjack.cpp
 APP_OBJECTS  := $(APP_SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 APP_TARGET   := blackjack
 
@@ -31,13 +33,13 @@ tests: build $(TEST_TARGET)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -MMD -o $@
 
-$(APP_TARGET): $(APP_OBJECTS)
+$(APP_TARGET): $(APP_OBJECTS) $(BUILD_DIR)/main.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -MMD -o $@
 
-$(TEST_TARGET): $(TEST_OBJECTS)
+$(TEST_TARGET): $(TEST_OBJECTS) $(APP_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS)
 
 -include $(DEPENDENCIES)

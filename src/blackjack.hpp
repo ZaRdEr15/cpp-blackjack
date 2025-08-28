@@ -30,6 +30,7 @@ namespace Blackjack {
         std::string_view suit;      // ♣♦♥♠ (purely aesthetic)
 
         Card(std::string_view f, std::string_view s);
+    private:
         void faceToValue(std::string_view f);
     };
 
