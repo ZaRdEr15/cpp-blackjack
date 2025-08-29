@@ -5,19 +5,11 @@
 
 namespace Blackjack {
 
-    Card::Card(std::string_view f, std::string_view s) : face {f}, suit {s} {
-        faceToValue(f);
-    }
+    Card::Card(std::string_view f, std::string_view s) : face {f}, suit {s}, value {FaceToValue.at(std::string {f})} {}
 
-    void Card::faceToValue(std::string_view f) {
-        if (f == "J" || f == "Q" || f == "K" || f == "10") {
-            value = 10;
-        } else if (f == "A") {
-            value = 1;
-        } else {
-            value = f[0] - '0';
-        }
-    }
+    const std::unordered_map<std::string_view, int> Card::FaceToValue {
+        {"2", 2}, {"3", 3}, {"4", 4}, {"5", 5}, {"6", 6}, {"7", 7}, {"8", 8}, {"9", 9}, {"10", 10}, {"J", 10}, {"Q", 10}, {"K", 10}, {"A", 1}
+    };
 
     Deck::Deck() {}
 
@@ -34,7 +26,7 @@ namespace Blackjack {
 
     void Deck::fillAndShuffleDeck() {
         if (deck.size() <= MinDeckSizeBeforeRefill) {
-            if (!deck.empty()) {
+            if (!deck.empty()) { // To not show first time when deck is empty
                 std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
                 deck.clear(); 
             }
@@ -90,7 +82,7 @@ namespace Blackjack {
     }
 
     Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {
-        action_map['h'] = [=](Deck& deck_instance) { hit(deck_instance); };
+        action_map['h'] = [=](Deck& deck_instance) { hit(deck_instance); }; // [=] capture by value captures '[this]'
         action_map['s'] = [=]([[maybe_unused]] Deck& deck_instance) { stand(); };
         action_map['d'] = [=](Deck& deck_instance) { doubleDown(deck_instance); };
         action_map['p'] = [=]([[maybe_unused]] Deck& deck_instance) { split(); };
@@ -155,7 +147,7 @@ namespace Blackjack {
         return ss.str();
     }
 
-    Game::Game() {}
+    Game::Game() : deck {} {}
 
     void Game::play() {
         while (true) {
