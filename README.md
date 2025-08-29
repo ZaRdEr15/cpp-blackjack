@@ -27,11 +27,9 @@ Running the application choose any of the actions inside the parentheses (single
 To stop the application, press CTRL+C to kill the process.
 
 ## Roadmap
-- [ ] Make string to be outputted in the showCards be constructed beforehand using stringstream
 - [ ] Apply SOLID principles (Game as outer class, Card, HandHolder, Player, Dealer as inner classes)
 - [ ] Make it possible to unit test functions but not break OOP principles
 - [ ] Add betting
-- [ ] Improve visual to make tabular in one row, Player hand and Dealer hand visible while action is at the bottom
 - [ ] Add split action
 - [ ] Add insurance (only if up card is an ace)
 
