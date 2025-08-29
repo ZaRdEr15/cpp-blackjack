@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits> // for std::numeric_limits
 #include "blackjack.hpp"
 
 namespace Blackjack {
@@ -52,7 +53,12 @@ namespace Blackjack {
         }
     }
 
-    Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}
+    Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {
+        action_map['h'] = [=](Game& game_instance) { hit(game_instance); };
+        action_map['s'] = [=]([[maybe_unused]] Game& game_instance) { stand(); };
+        action_map['d'] = [=](Game& game_instance) { doubleDown(game_instance); };
+        action_map['p'] = [=]([[maybe_unused]] Game& game_instance) { split(); };
+    }
 
     void Player::showCards() {
         std::cout << "Player hand (" << total_value << "):\n";
@@ -61,32 +67,25 @@ namespace Blackjack {
         }
     }
 
-    void Player::chooseAction(Game& game_instance) {
+    void Player::promptAndProcess(Game& game_instance) {
         while (!finished) {
             char action;
             std::cout << "Choose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
             std::cin >> action;
-            switch (action) {
-                case 'h':
-                    hit(game_instance);
-                    showCards();
-                    break;
-                case 's':
-                    stand();
-                    showCards();
-                    break;
-                case 'd':
-                    doubleDown(game_instance);
-                    showCards();
-                    break;
-                case 'p':
-                    split();
-                    break;
-                default:
-                    std::cout << "Incorrect input! Try again.\n";
-                    continue;
+            bool input_correct {std::cin};
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore everything up to '\n' and remove it as well
+            if ((PossibleActions.find(action) != PossibleActions.npos) && input_correct) {
+                processAction(action, game_instance);
+                showCards();
+            } else {
+                std::cout << "Incorrect input! Try again.\n";
             }
         }
+    }
+
+    void Player::processAction(const char& action, Game& game_instance) {   
+        action_map[action](game_instance);
     }
 
     void Player::doubleDown(Game& game_instance) {
@@ -134,7 +133,7 @@ namespace Blackjack {
             Dealer dealer {initialDeal()};
             dealer.showCards();
             player.showCards();
-            player.chooseAction(*this);
+            player.promptAndProcess(*this);
             dealer.playHand(player.total_value, *this);
             dealer.showCards();
             decideWinner(player, dealer);

@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <random>
 #include <array>
+#include <unordered_map>
+#include <functional>
 
 namespace Blackjack {
 
@@ -15,6 +17,8 @@ namespace Blackjack {
     };
 
     inline std::mt19937 mt {std::random_device {}()};
+
+    inline constexpr std::string_view PossibleActions {"hsdp"};
 
     // forward declarations
     class Card;
@@ -34,7 +38,7 @@ namespace Blackjack {
         void faceToValue(std::string_view f);
     };
 
-    // abstract base class
+    // abstract base class, objects are not allowed
     class HandHolder {
     public:
         int total_value;
@@ -59,8 +63,11 @@ namespace Blackjack {
 
         Player(std::vector<Card> initial_hand);
         void showCards() override;
-        void chooseAction(Game& game_instance);
+        void promptAndProcess(Game& game_instance);
     private:
+        std::unordered_map<char, std::function<void(Game&)>> action_map;
+
+        void processAction(const char& action, Game& game_instance);
         void doubleDown(Game& game_instance);  // increase bet by 100% and take exactly one card, then stand
         void split();       // split cards into two separate hands
     };
