@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits> // for std::numeric_limits
+#include <sstream> // for std::stringstream
 #include "blackjack.hpp"
 
 namespace Blackjack {
@@ -18,15 +19,50 @@ namespace Blackjack {
         }
     }
 
+    Deck::Deck() {}
+
+    std::vector<Card> Deck::initialDeal() {
+        std::vector<Card> initial_hand {takeCard(), takeCard()};
+        return initial_hand;
+    }
+
+    Card Deck::takeCard() {
+        Card card {deck.back()};
+        deck.pop_back();
+        return card;
+    }
+
+    void Deck::fillAndShuffleDeck() {
+        if (deck.size() <= MinDeckSizeBeforeRefill) {
+            if (!deck.empty()) {
+                std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
+                deck.clear(); 
+            }
+            for (std::string_view suit : Suit) {
+                for (std::string_view face : SingleSuitFaces) {
+                    deck.push_back(Card {face, suit});
+                }
+            }
+            std::shuffle(std::begin(deck), std::end(deck), mt);
+        }
+    }
+
+    void Deck::showDeck() {
+        std::cout << "Deck (" << deck.size() << "):" << '\n';
+        for (const auto& card : deck) {
+            std::cout << card.face << card.suit << ' ';
+        }
+    }
+
     HandHolder::HandHolder(std::vector<Card> initial_hand) :
-        total_value {0}, hand {initial_hand}, finished {false}  {
+        total_value {0}, finished {false}, hand {initial_hand}  {
         calculateTotalValue();
     }
 
     HandHolder::~HandHolder() {}
 
-    void HandHolder::hit(Game& game_instance) {
-        hand.push_back(game_instance.takeCard());
+    void HandHolder::hit(Deck& deck_instance) {
+        hand.push_back(deck_instance.takeCard());
         calculateTotalValue();
     }
 
@@ -54,42 +90,32 @@ namespace Blackjack {
     }
 
     Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {
-        action_map['h'] = [=](Game& game_instance) { hit(game_instance); };
-        action_map['s'] = [=]([[maybe_unused]] Game& game_instance) { stand(); };
-        action_map['d'] = [=](Game& game_instance) { doubleDown(game_instance); };
-        action_map['p'] = [=]([[maybe_unused]] Game& game_instance) { split(); };
+        action_map['h'] = [=](Deck& deck_instance) { hit(deck_instance); };
+        action_map['s'] = [=]([[maybe_unused]] Deck& deck_instance) { stand(); };
+        action_map['d'] = [=](Deck& deck_instance) { doubleDown(deck_instance); };
+        action_map['p'] = [=]([[maybe_unused]] Deck& deck_instance) { split(); };
     }
 
     void Player::showCards() {
-        std::cout << "Player hand (" << total_value << "):\n";
+        std::cout << getCardsString();
+    }
+
+    void Player::processAction(const char& action, Deck& deck_instance) {   
+        action_map[action](deck_instance);
+    }
+
+    std::string Player::getCardsString() {
+        std::stringstream ss;
+        ss << "Player hand (" << total_value << "): ";
         for (const auto& card : hand) {
-            std::cout << card.face << card.suit << '\n';
+            ss << card.face << card.suit << ' ';
         }
+        ss << '\n';
+        return ss.str();
     }
 
-    void Player::promptAndProcess(Game& game_instance) {
-        while (!finished) {
-            char action;
-            std::cout << "Choose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
-            std::cin >> action;
-            bool input_correct {std::cin};
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore everything up to '\n' and remove it as well
-            if ((PossibleActions.find(action) != PossibleActions.npos) && input_correct) {
-                processAction(action, game_instance);
-                showCards();
-            } else {
-                std::cout << "Incorrect input! Try again.\n";
-            }
-        }
-    }
-
-    void Player::processAction(const char& action, Game& game_instance) {   
-        action_map[action](game_instance);
-    }
-
-    void Player::doubleDown(Game& game_instance) {
-        hit(game_instance);
+    void Player::doubleDown(Deck& deck_instance) {
+        hit(deck_instance);
         finished = true;
     }
 
@@ -99,78 +125,87 @@ namespace Blackjack {
 
     Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand}, show_once {true} {}
 
-    void Dealer::playHand(const int& player_total, Game& game_instance) {
+    void Dealer::playHand(const int& player_total, Deck& deck_instance) {
         if (player_total > Blackjack) {
             finished = true;
             return;
         }
         while (!finished) {
-            total_value < DealerStand ? hit(game_instance) : stand();
+            total_value < DealerStand ? hit(deck_instance) : stand();
         }
     }
 
     void Dealer::showCards() {
-        if (!finished && show_once) {
+        std::cout << getCardsString();
+    }
+
+    std::string Dealer::getCardsString() {
+        std::stringstream ss;
+        if (!finished || show_once) {
             show_once = false;
-            std::cout << "Dealer hand:" << '\n'
-                      << hand[0].face << hand[0].suit << '\n'
-                      << "X" << '\n';
+            ss << "Dealer hand: " << hand[0].face << hand[0].suit << " ▮\n";
         } else {
             show_once = true;
-            std::cout << "Dealer hand (" << total_value << "):\n";
+            ss << "Dealer hand (" << total_value << "): ";
             for (const auto& card : hand) {
-                std::cout << card.face << card.suit << '\n';
+                ss << card.face << card.suit << ' ';
             }
+            ss << '\n';
         }
+        return ss.str();
     }
 
     Game::Game() {}
 
     void Game::play() {
         while (true) {
-            fillDeck();
-            Player player {initialDeal()};
-            Dealer dealer {initialDeal()};
-            dealer.showCards();
-            player.showCards();
-            player.promptAndProcess(*this);
-            dealer.playHand(player.total_value, *this);
-            dealer.showCards();
+            deck.fillAndShuffleDeck();
+            Dealer dealer {deck.initialDeal()};
+            Player player {deck.initialDeal()};
+            playerTurn(dealer, player);
+            dealerTurn(dealer, player);
             decideWinner(player, dealer);
         }
     }
 
-    std::vector<Card> Game::initialDeal() {
-        std::vector<Card> initial_hand {takeCard(), takeCard()};
-        return initial_hand;
+    void Game::displayGameState(Dealer& dealer_instance, Player& player_instance) {
+        dealer_instance.showCards();
+        player_instance.showCards();
     }
 
-    Card Game::takeCard() {
-        Card card {deck.back()};
-        deck.pop_back();
-        return card;
+    bool Game::isValidInput() {
+        bool input_correct {std::cin};
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore everything up to '\n' and remove it as well
+        return input_correct;
     }
 
-    void Game::fillDeck() {
-        if (deck.size() <= MinDeckSizeBeforeRefill) {
-            if (!deck.empty()) {
-                std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
-                deck.clear(); 
-            }
-            for (std::string_view suit : Suit) {
-                for (std::string_view face : SingleSuitFaces) {
-                    deck.push_back(Card {face, suit});
-                }
-            }
-            std::shuffle(std::begin(deck), std::end(deck), mt);
+    bool Game::isValidAction(const char& action) {
+        return (PossibleActions.find(action) != PossibleActions.npos);
+    }
+
+    void Game::handlePlayerInput(Player& player_instance) {
+        char action;
+        std::cout << "\nChoose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
+        std::cin >> action;
+        std::cout << '\n';
+        if (isValidAction(action) && isValidInput()) {
+            player_instance.processAction(action, deck);
+        } else {
+            std::cout << "Incorrect input! Try again.\n";
         }
     }
 
-    void Game::showDeck() {
-        std::cout << "Deck (" << deck.size() << "):" << '\n';
-        for (const auto& card : deck) {
-            std::cout << card.face << card.suit << ' ';
+    void Game::playerTurn(Dealer& dealer_instance, Player& player_instance) {
+        while (!player_instance.finished) {
+            displayGameState(dealer_instance, player_instance);
+            handlePlayerInput(player_instance);
         }
+    }
+
+    void Game::dealerTurn(Dealer& dealer_instance, Player& player_instance) {
+        dealer_instance.playHand(player_instance.total_value, deck);
+        displayGameState(dealer_instance, player_instance);
     }
 
     void Game::decideWinner(const Player& player, const Dealer& dealer) {
