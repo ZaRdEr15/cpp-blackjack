@@ -1,5 +1,6 @@
 CXX          := g++
 CXXFLAGS     := -pedantic-errors -Wall -Wextra -Werror -std=c++17
+LDFLAGS      := -static
 LDLIBS       := -lCppUTest
 
 BUILD_DIR    := build
@@ -11,6 +12,7 @@ CXXFLAGS += -I$(SRC_DIR)
 APP_SRC      := $(SRC_DIR)/blackjack.cpp
 APP_OBJECTS  := $(APP_SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 APP_TARGET   := blackjack
+RELEASE_TARGET := blackjack_release
 
 TEST_SRC     := $(wildcard $(TEST_DIR)/*.cpp)
 TEST_OBJECTS := $(TEST_SRC:$(TEST_DIR)/%.cpp=$(BUILD_DIR)/%.o)
@@ -36,6 +38,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_TARGET): $(APP_OBJECTS) $(BUILD_DIR)/main.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+$(RELEASE_TARGET): $(APP_OBJECTS) $(BUILD_DIR)/main.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -MMD -o $@
 
@@ -48,7 +53,7 @@ build:
 	@if [ ! -d "build" ]; then mkdir -p build; fi
 
 release: CXXFLAGS += -O3
-release: build $(APP_TARGET)
+release: build $(RELEASE_TARGET)
 
 clean:
 	-@rm -rvf $(BUILD_DIR) $(APP_TARGET) $(TEST_TARGET)
