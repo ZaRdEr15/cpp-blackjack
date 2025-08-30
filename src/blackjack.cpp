@@ -43,7 +43,7 @@ namespace Blackjack {
 
     void Deck::showDeck() {
         std::cout << "Deck (" << deck.size() << "):" << '\n';
-        for (const auto& card : deck) {
+        for (const Card& card : deck) {
             std::cout << card.face << card.suit << ' ';
         }
     }
@@ -72,7 +72,7 @@ namespace Blackjack {
 
     void HandHolder::calculateTotalValue() {
         total_value = 0;
-        for (const auto& card : hand) {
+        for (const Card& card : hand) {
             total_value += card.value;
         }
         if (hasAce() && total_value + 10 <= Blackjack) {
@@ -97,7 +97,7 @@ namespace Blackjack {
     std::string Player::getCardsString() {
         std::ostringstream ss;
         ss << "Player hand (" << total_value << "): ";
-        for (const auto& card : hand) {
+        for (const Card& card : hand) {
             ss << card.face << card.suit << ' ';
         }
         ss << '\n';
@@ -131,7 +131,7 @@ namespace Blackjack {
             ss << "Dealer hand: " << hand[0].face << hand[0].suit << " ▮\n";
         } else {
             ss << "Dealer hand (" << total_value << "): ";
-            for (const auto& card : hand) {
+            for (const Card& card : hand) {
                 ss << card.face << card.suit << ' ';
             }
             ss << '\n';
