@@ -215,6 +215,7 @@ namespace Blackjack {
         } else if (player.total_value == dealer.total_value) {
             std::cout << "Draw!\n\n";
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Press Enter to continue"; // Let user observe win
+        std::cin.get();
     }
 }
