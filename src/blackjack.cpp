@@ -1,6 +1,8 @@
 #include <iostream>
 #include <limits> // for std::numeric_limits
 #include <sstream> // for std::stringstream
+#include <thread> // for std::this_thread::sleep_for
+#include <chrono> // for std::chrono::seconds
 #include "blackjack.hpp"
 
 namespace Blackjack {
@@ -88,16 +90,12 @@ namespace Blackjack {
         action_map['p'] = [=]([[maybe_unused]] Deck& deck_instance) { split(); };
     }
 
-    void Player::showCards() {
-        std::cout << getCardsString();
-    }
-
     void Player::processAction(const char& action, Deck& deck_instance) {   
         action_map[action](deck_instance);
     }
 
     std::string Player::getCardsString() {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Player hand (" << total_value << "): ";
         for (const auto& card : hand) {
             ss << card.face << card.suit << ' ';
@@ -115,7 +113,7 @@ namespace Blackjack {
         // not implemented yet
     }
 
-    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand}, show_once {true} {}
+    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}
 
     void Dealer::playHand(const int& player_total, Deck& deck_instance) {
         if (player_total > Blackjack) {
@@ -127,17 +125,11 @@ namespace Blackjack {
         }
     }
 
-    void Dealer::showCards() {
-        std::cout << getCardsString();
-    }
-
-    std::string Dealer::getCardsString() {
-        std::stringstream ss;
-        if (!finished || show_once) {
-            show_once = false;
+    std::string Dealer::getCardsString(const bool& player_turn_finished) {
+        std::ostringstream ss;
+        if (!player_turn_finished) {
             ss << "Dealer hand: " << hand[0].face << hand[0].suit << " ▮\n";
         } else {
-            show_once = true;
             ss << "Dealer hand (" << total_value << "): ";
             for (const auto& card : hand) {
                 ss << card.face << card.suit << ' ';
@@ -151,6 +143,7 @@ namespace Blackjack {
 
     void Game::play() {
         while (true) {
+            system("clear");
             deck.fillAndShuffleDeck();
             Dealer dealer {deck.initialDeal()};
             Player player {deck.initialDeal()};
@@ -161,8 +154,8 @@ namespace Blackjack {
     }
 
     void Game::displayGameState(Dealer& dealer_instance, Player& player_instance) {
-        dealer_instance.showCards();
-        player_instance.showCards();
+        std::cout << dealer_instance.getCardsString(player_instance.finished);
+        std::cout << player_instance.getCardsString();
     }
 
     bool Game::isValidInput() {
@@ -180,11 +173,12 @@ namespace Blackjack {
         char action;
         std::cout << "\nChoose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
         std::cin >> action;
-        std::cout << '\n';
-        if (isValidAction(action) && isValidInput()) {
+        if (isValidInput() && isValidAction(action)) {
+            std::cout << '\n';
             player_instance.processAction(action, deck);
         } else {
             std::cout << "Incorrect input! Try again.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(800));
         }
     }
 
@@ -192,6 +186,7 @@ namespace Blackjack {
         while (!player_instance.finished) {
             displayGameState(dealer_instance, player_instance);
             handlePlayerInput(player_instance);
+            system("clear"); // clear terminal (cross-platform)
         }
     }
 
@@ -212,5 +207,6 @@ namespace Blackjack {
         } else if (player.total_value == dealer.total_value) {
             std::cout << "Draw!\n\n";
         }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }

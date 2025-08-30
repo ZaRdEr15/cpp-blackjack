@@ -54,11 +54,9 @@ namespace Blackjack {
 
         HandHolder(std::vector<Card> initial_hand);
         virtual ~HandHolder(); // always include virtual destructor of a base polymorphic class
-        virtual void showCards() = 0; // pure virtual function
     protected:
         std::vector<Card> hand;
 
-        virtual std::string getCardsString() = 0;
         void hit(Deck& deck_instance);
         void stand();
     private:
@@ -71,12 +69,11 @@ namespace Blackjack {
         //std::vector<std::vector<Card>> additional_hands;
 
         Player(std::vector<Card> initial_hand);
-        void showCards() override;
         void processAction(const char& action, Deck& deck_instance);
+        std::string getCardsString();
     private:
         std::unordered_map<char, std::function<void(Deck&)>> action_map;
 
-        std::string getCardsString() override;
         void doubleDown(Deck& deck_instance);  // increase bet by 100% and take exactly one card, then stand
         void split();       // split cards into two separate hands
     };
@@ -85,12 +82,9 @@ namespace Blackjack {
     public:
         Dealer(std::vector<Card> initial_hand);
         void playHand(const int& player_total, Deck& deck_instance);
-        void showCards() override; // shows 1 card before player finished and all after finished
+        std::string getCardsString(const bool& player_turn_finished);
     private:
         static constexpr int DealerStand {17};
-        bool show_once; // show one card hidden even if dealer has 21 or after game won/lost first round
-
-        std::string getCardsString() override;
     };
 
     class Game {
