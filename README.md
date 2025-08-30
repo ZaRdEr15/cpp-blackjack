@@ -1,6 +1,6 @@
-# CLI Blackjack game made in C++17
+# Cross-platform CLI Blackjack game made in C++17
 
-Command line blackjack game built with C++17 using OOP principles as a way to improve modern C++ knowledge.
+Cross-platform (Linux, MacOS, Windows) Command line blackjack game built with C++17 using OOP principles as a way to improve modern C++ knowledge.
 
 ## Prerequisites
 - For compilation and linking: GCC version 9 and up

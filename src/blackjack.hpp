@@ -95,6 +95,7 @@ namespace Blackjack {
         static constexpr std::string_view PossibleActions {"hsdp"};
         Deck deck;
 
+        void clearTerminal();
         void displayGameState(Dealer& dealer_instance, Player& player_instance);
         bool isValidInput();
         bool isValidAction(const char& action);

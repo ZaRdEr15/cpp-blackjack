@@ -143,7 +143,7 @@ namespace Blackjack {
 
     void Game::play() {
         while (true) {
-            system("clear");
+            clearTerminal();
             deck.fillAndShuffleDeck();
             Dealer dealer {deck.initialDeal()};
             Player player {deck.initialDeal()};
@@ -151,6 +151,14 @@ namespace Blackjack {
             dealerTurn(dealer, player);
             decideWinner(player, dealer);
         }
+    }
+
+    void Game::clearTerminal() {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 
     void Game::displayGameState(Dealer& dealer_instance, Player& player_instance) {
@@ -186,7 +194,7 @@ namespace Blackjack {
         while (!player_instance.finished) {
             displayGameState(dealer_instance, player_instance);
             handlePlayerInput(player_instance);
-            system("clear"); // clear terminal (cross-platform)
+            clearTerminal();
         }
     }
 
