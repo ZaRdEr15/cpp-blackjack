@@ -56,7 +56,7 @@ release: CXXFLAGS += -O3
 release: build $(RELEASE_TARGET)
 
 clean:
-	-@rm -rvf $(BUILD_DIR) $(APP_TARGET) $(TEST_TARGET)
+	-@rm -rvf $(BUILD_DIR) $(APP_TARGET) $(TEST_TARGET) $(RELEASE_TARGET)
 
 info:
 	@echo $(APP_SRC)
