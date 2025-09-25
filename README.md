@@ -27,8 +27,8 @@ Running the application choose any of the actions inside the parentheses (single
 To stop the application, press CTRL+C to kill the process.
 
 ## Roadmap
-- [ ] Apply SOLID principles (Game as outer class, Card, HandHolder, Player, Dealer as inner classes)
 - [ ] Make it possible to unit test functions but not break OOP principles
+- [ ] Show dealer single card value before reveal
 - [ ] Add betting
 - [ ] Add split action
 - [ ] Add insurance (only if up card is an ace)
