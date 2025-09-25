@@ -1,62 +1,74 @@
 #include <iostream>
-#include <limits> // for std::numeric_limits
-#include <sstream> // for std::stringstream
-#include <thread> // for std::this_thread::sleep_for
-#include <chrono> // for std::chrono::seconds
+#include <limits>   // std::numeric_limits
+#include <sstream>  // std::stringstream
+#include <thread>   // std::this_thread::sleep_for
+#include <chrono>   // std::chrono::seconds
 #include "blackjack.hpp"
 
 namespace Blackjack {
 
-    Card::Card(std::string_view f, std::string_view s) : face {f}, suit {s}, value {FaceToValue.at(std::string {f})} {}
+    Card::Card(std::string_view f, std::string_view s) : face{ f }, 
+                                                         suit{ s }, 
+                                                         value{ FaceToValue.at(f) } {}
 
-    const std::unordered_map<std::string_view, int> Card::FaceToValue {
-        {"2", 2}, {"3", 3}, {"4", 4}, {"5", 5}, {"6", 6}, {"7", 7}, {"8", 8}, {"9", 9}, {"10", 10}, {"J", 10}, {"Q", 10}, {"K", 10}, {"A", 1}
+    const std::unordered_map<std::string_view, int> Card::FaceToValue{
+        {"2",  2}, {"3",  3}, {"4", 4}, {"5",   5}, {"6",  6},
+        {"7",  7}, {"8",  8}, {"9", 9}, {"10", 10}, {"J", 10}, 
+        {"Q", 10}, {"K", 10}, {"A", 1}
     };
 
-    Deck::Deck() {}
-
-    std::vector<Card> Deck::initialDeal() {
-        std::vector<Card> initial_hand {takeCard(), takeCard()};
-        return initial_hand;
+    Deck::Deck() {
+        shuffle();
     }
 
     Card Deck::takeCard() {
-        Card card {deck.back()};
-        deck.pop_back();
+        Card card{ cards.back() };
+        cards.pop_back();
         return card;
     }
 
-    void Deck::fillAndShuffleDeck() {
-        if (deck.size() <= MinDeckSizeBeforeRefill) {
-            if (!deck.empty()) { // To not show first time when deck is empty
-                std::cout << "Shuffling cards... (Deck size: " << deck.size() << ")\n";
-                deck.clear(); 
-            }
-            for (std::string_view suit : Suit) {
-                for (std::string_view face : SingleSuitFaces) {
-                    deck.push_back(Card {face, suit});
-                }
-            }
-            std::shuffle(std::begin(deck), std::end(deck), mt);
-        }
+    bool Deck::needsShuffle() const {
+        return cards.size() <= MinDeckSizeBeforeRefill;
     }
 
-    void Deck::showDeck() {
-        std::cout << "Deck (" << deck.size() << "):" << '\n';
-        for (const Card& card : deck) {
+    void Deck::shuffle() {
+        cards.clear();
+        for (auto suit : Suit) {
+            for (auto face : SingleSuitFaces) {
+                cards.push_back(Card{ face, suit });
+            }
+        }
+        std::shuffle(cards.begin(), cards.end(), mt);
+    }
+
+    void Deck::showDeck() const {
+        std::cout << "Deck (" << cards.size() << "):" << '\n';
+        for (const auto& card : cards) {
             std::cout << card.face << card.suit << ' ';
         }
     }
 
-    HandHolder::HandHolder(std::vector<Card> initial_hand) :
-        total_value {0}, finished {false}, hand {initial_hand}  {
-        calculateTotalValue();
-    }
+    HandHolder::HandHolder() : hand{}, finished{}, total_value{} {}
 
     HandHolder::~HandHolder() {}
 
-    void HandHolder::hit(Deck& deck_instance) {
-        hand.push_back(deck_instance.takeCard());
+    void HandHolder::startNewHand(Deck& deck) {
+        hand.clear();
+        hand.insert(hand.end(), { deck.takeCard(), deck.takeCard() });
+        finished = false;
+        calculateTotalValue();
+    }
+
+    int HandHolder::getTotalValue() const {
+        return total_value;
+    }
+
+    bool HandHolder::isFinished() const {
+        return finished;
+    }
+
+    void HandHolder::hit(Deck& deck) {
+        hand.push_back(deck.takeCard());
         calculateTotalValue();
     }
 
@@ -72,7 +84,7 @@ namespace Blackjack {
 
     void HandHolder::calculateTotalValue() {
         total_value = 0;
-        for (const Card& card : hand) {
+        for (const auto& card : hand) {
             total_value += card.value;
         }
         if (hasAce() && total_value + 10 <= Blackjack) {
@@ -83,20 +95,21 @@ namespace Blackjack {
         }
     }
 
-    Player::Player(std::vector<Card> initial_hand) : HandHolder {initial_hand} {
-        action_map['h'] = [=](Deck& deck_instance) { hit(deck_instance); }; // [=] capture by value captures '[this]'
-        action_map['s'] = [=]([[maybe_unused]] Deck& deck_instance) { stand(); };
-        action_map['d'] = [=](Deck& deck_instance) { doubleDown(deck_instance); };
-        action_map['p'] = [=]([[maybe_unused]] Deck& deck_instance) { split(); };
+    Player::Player() : HandHolder{} {
+        // [=] capture by value captures '[this]'
+        action_map['h'] = [=](Deck& deck) { hit(deck); };
+        action_map['s'] = [=](Deck&) { stand(); };
+        action_map['d'] = [=](Deck& deck) { doubleDown(deck); };
+        action_map['p'] = [=](Deck&) { split(); };
     }
 
-    void Player::processAction(const char& action, Deck& deck_instance) {   
-        action_map[action](deck_instance);
+    void Player::processAction(char action, Deck& deck) {   
+        action_map[action](deck);
     }
 
     std::string Player::getCardsString() {
         std::ostringstream ss;
-        ss << "Player hand (" << total_value << "): ";
+        ss << "Player hand (" << getTotalValue() << "): ";
         for (const Card& card : hand) {
             ss << card.face << card.suit << ' ';
         }
@@ -104,8 +117,8 @@ namespace Blackjack {
         return ss.str();
     }
 
-    void Player::doubleDown(Deck& deck_instance) {
-        hit(deck_instance);
+    void Player::doubleDown(Deck& deck) {
+        hit(deck);
         finished = true;
     }
 
@@ -113,25 +126,25 @@ namespace Blackjack {
         // not implemented yet
     }
 
-    Dealer::Dealer(std::vector<Card> initial_hand) : HandHolder {initial_hand} {}
+    Dealer::Dealer() : HandHolder{} {}
 
-    void Dealer::playHand(const int& player_total, Deck& deck_instance) {
+    void Dealer::playHand(int player_total, Deck& deck) {
         if (player_total > Blackjack) {
             finished = true;
             return;
         }
         while (!finished) {
-            total_value < DealerStand ? hit(deck_instance) : stand();
+            getTotalValue() < DealerStand ? hit(deck) : stand();
         }
     }
 
-    std::string Dealer::getCardsString(const bool& player_turn_finished) {
+    std::string Dealer::getCardsString(bool player_turn_finished) {
         std::ostringstream ss;
         if (!player_turn_finished) {
             ss << "Dealer hand: " << hand[0].face << hand[0].suit << " ▮\n";
         } else {
-            ss << "Dealer hand (" << total_value << "): ";
-            for (const Card& card : hand) {
+            ss << "Dealer hand (" << getTotalValue() << "): ";
+            for (const auto& card : hand) {
                 ss << card.face << card.suit << ' ';
             }
             ss << '\n';
@@ -139,17 +152,20 @@ namespace Blackjack {
         return ss.str();
     }
 
-    Game::Game() : deck {} {}
+    Game::Game() : deck{}, dealer{}, player{} {}
 
     void Game::play() {
         while (true) {
             clearTerminal();
-            deck.fillAndShuffleDeck();
-            Dealer dealer {deck.initialDeal()};
-            Player player {deck.initialDeal()};
-            playerTurn(dealer, player);
-            dealerTurn(dealer, player);
-            decideWinner(player, dealer);
+            if (deck.needsShuffle()) {
+                std::cout << "Shuffling cards...\n";
+                deck.shuffle();
+            }
+            player.startNewHand(deck);
+            dealer.startNewHand(deck);
+            playerTurn();
+            dealerTurn();
+            decideWinner();
         }
     }
 
@@ -161,61 +177,65 @@ namespace Blackjack {
 #endif
     }
 
-    void Game::displayGameState(Dealer& dealer_instance, Player& player_instance) {
-        std::cout << dealer_instance.getCardsString(player_instance.finished);
-        std::cout << player_instance.getCardsString();
+    void Game::displayGameState() {
+        std::cout << dealer.getCardsString(player.isFinished());
+        std::cout << player.getCardsString();
     }
 
     bool Game::isValidInput() {
-        bool input_correct {std::cin};
+        bool input_correct{ std::cin };
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore everything up to '\n' and remove it as well
         return input_correct;
     }
 
-    bool Game::isValidAction(const char& action) {
-        return (PossibleActions.find(action) != PossibleActions.npos);
+    bool Game::isValidAction(char action) {
+        return PossibleActions.find(action) != PossibleActions.npos;
     }
 
-    void Game::handlePlayerInput(Player& player_instance) {
+    void Game::handlePlayerInput() {
         char action;
         std::cout << "\nChoose your next action\n(h)it, (s)tand, (d)ouble down, s(p)lit: ";
         std::cin >> action;
         if (isValidInput() && isValidAction(action)) {
             std::cout << '\n';
-            player_instance.processAction(action, deck);
+            player.processAction(action, deck);
         } else {
             std::cout << "Incorrect input! Try again.\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(800));
         }
     }
 
-    void Game::playerTurn(Dealer& dealer_instance, Player& player_instance) {
-        while (!player_instance.finished) {
-            displayGameState(dealer_instance, player_instance);
-            handlePlayerInput(player_instance);
+    void Game::playerTurn() {
+        while (!player.isFinished()) {
+            displayGameState();
+            handlePlayerInput();
             clearTerminal();
         }
     }
 
-    void Game::dealerTurn(Dealer& dealer_instance, Player& player_instance) {
-        dealer_instance.playHand(player_instance.total_value, deck);
-        displayGameState(dealer_instance, player_instance);
+    void Game::dealerTurn() {
+        dealer.playHand(player.getTotalValue(), deck);
+        displayGameState();
     }
 
-    void Game::decideWinner(const Player& player, const Dealer& dealer) {
-        if (player.total_value > Blackjack) {
-            std::cout << "Dealer won! Player is over 21.\n\n";
-        } else if (dealer.total_value > Blackjack) {
-            std::cout << "Player won! Dealer is over 21.\n\n";
-        } else if (player.total_value > dealer.total_value) {
-            std::cout << "Player won!\n\n";
-        } else if (dealer.total_value > player.total_value) {
-            std::cout << "Dealer won!\n\n";
-        } else if (player.total_value == dealer.total_value) {
-            std::cout << "Draw!\n\n";
+    void Game::decideWinner() {
+        const int player_total{ player.getTotalValue() };
+        const int dealer_total{ dealer.getTotalValue() };
+        std::string result{};
+        if (player_total > Blackjack) {
+            result = "Dealer won! Player is over 21.";
+        } else if (dealer_total > Blackjack) {
+            result = "Player won! Dealer is over 21.";
+        } else if (player_total > dealer_total) {
+            result = "Player won!";
+        } else if (dealer_total > player_total) {
+            result = "Dealer won!";
+        } else {
+            result = "Draw!";
         }
-        std::cout << "Press Enter to continue"; // Let user observe win
+        std::cout << result << "\n\n";
+        std::cout << "Press Enter to continue "; // Let user observe win
         std::cin.get();
     }
 }
