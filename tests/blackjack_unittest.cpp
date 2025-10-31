@@ -3,13 +3,6 @@
 #include "blackjack.hpp"
 
 TEST_GROUP(CardTestGroup) {
-    void setup() {
-
-    }
-
-    void teardown() {
-
-    }
 };
 
 TEST(CardTestGroup, ConstructorInitializesCorrectly) {

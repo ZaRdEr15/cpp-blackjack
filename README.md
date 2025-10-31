@@ -4,21 +4,31 @@ Cross-platform (Linux, MacOS, Windows) Command line blackjack game built with C+
 
 ## Prerequisites
 - For compilation and linking: GCC version 9 and up
-- For build automation: Make
-- For running unit tests: [CppUTest](https://cpputest.github.io/) (must be a system install)
+- For build automation: CMake and Ninja
+- For running unit tests: [CppUTest](https://cpputest.github.io/) (fetched using CMake)
 
 ## Installation
 `git clone https://github.com/ZaRdEr15/cpp-blackjack.git`
 
 ## How to build
-To build the application:
-`make`
-
-To build and run tests:
-`make tests`
+To build the application (builds tests also):
+```
+mkdir build_debug
+cd build_debug
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
+ninja
+```
 
 To build for release (has no debug information):
-`make release`
+```
+mkdir build_debug
+cd build_debug
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+ninja
+```
+
+To run tests (inside build_debug/tests or build_release/tests):
+`ctest`
 
 ## Usage
 
