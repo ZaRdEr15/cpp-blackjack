@@ -21,8 +21,8 @@ ninja
 
 To build for release (has no debug information):
 ```
-mkdir build_debug
-cd build_debug
+mkdir build_release
+cd build_release
 cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja
 ```
