@@ -6,8 +6,7 @@
 
 int main() {
 #ifdef _WIN32
-    // Set console code page to UTF-8 so console knows how to interpret string data
-    SetConsoleOutputCP(65001);
+    SetConsoleOutputCP(CP_UTF8);
 #endif
     Blackjack::Game game;
     game.play();
