@@ -76,7 +76,7 @@ namespace Blackjack {
         finished = true;
     }
 
-    bool HandHolder::hasAce() {
+    bool HandHolder::hasAce() const {
         return std::any_of(hand.begin(), hand.end(), [](const Card& card) {
             return card.face == "A";
         });
@@ -107,7 +107,7 @@ namespace Blackjack {
         action_map[action](deck);
     }
 
-    std::string Player::getCardsString() {
+    std::string Player::getCardsString() const {
         std::ostringstream ss;
         ss << "Player hand (" << getTotalValue() << "): ";
         for (const Card& card : hand) {
@@ -138,7 +138,7 @@ namespace Blackjack {
         }
     }
 
-    std::string Dealer::getCardsString(bool player_turn_finished) {
+    std::string Dealer::getCardsString(bool player_turn_finished) const {
         std::ostringstream ss;
         if (!player_turn_finished) {
             ss << "Dealer hand: " << hand[0].face << hand[0].suit << " ▮\n";
@@ -169,7 +169,7 @@ namespace Blackjack {
         }
     }
 
-    void Game::clearTerminal() {
+    void Game::clearTerminal() const {
 #ifdef _WIN32
         system("cls");
 #else
@@ -177,7 +177,7 @@ namespace Blackjack {
 #endif
     }
 
-    void Game::displayGameState() {
+    void Game::displayGameState() const {
         std::cout << dealer.getCardsString(player.isFinished());
         std::cout << player.getCardsString();
     }
@@ -189,7 +189,7 @@ namespace Blackjack {
         return input_correct;
     }
 
-    bool Game::isValidAction(char action) {
+    bool Game::isValidAction(char action) const {
         return PossibleActions.find(action) != PossibleActions.npos;
     }
 
@@ -219,7 +219,7 @@ namespace Blackjack {
         displayGameState();
     }
 
-    void Game::decideWinner() {
+    void Game::decideWinner() const {
         const int player_total{ player.getTotalValue() };
         const int dealer_total{ dealer.getTotalValue() };
         std::string result{};

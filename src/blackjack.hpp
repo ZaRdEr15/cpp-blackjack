@@ -61,7 +61,7 @@ namespace Blackjack {
       bool finished;
 
     private:
-      bool hasAce();
+      bool hasAce() const;
       void calculateTotalValue();
 
       int total_value;
@@ -72,7 +72,7 @@ namespace Blackjack {
       Player();
       
       void processAction(char action, Deck& deck);
-      std::string getCardsString();
+      std::string getCardsString() const;
 
       //std::vector<std::vector<Card>> additional_hands;
 
@@ -89,7 +89,7 @@ namespace Blackjack {
       Dealer();
 
       void playHand(int player_total, Deck& deck);
-      std::string getCardsString(bool player_turn_finished);
+      std::string getCardsString(bool player_turn_finished) const;
 
     private:
       static constexpr int DealerStand {17};
@@ -104,14 +104,14 @@ namespace Blackjack {
     private:
       static constexpr std::string_view PossibleActions{ "hsdp" };
    
-      void clearTerminal();
-      void displayGameState();
+      void clearTerminal() const;
+      void displayGameState() const;
       bool isValidInput();
-      bool isValidAction(char action);
+      bool isValidAction(char action) const;
       void handlePlayerInput();
       void playerTurn();
       void dealerTurn();
-      void decideWinner();
+      void decideWinner() const;
 
       Deck deck;
       Dealer dealer;
