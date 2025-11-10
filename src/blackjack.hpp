@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <random>
 #include <array>
@@ -7,114 +8,121 @@
 
 namespace Blackjack {
 
-   inline constexpr int kBlackjack{ 21 };
+    inline constexpr int kBlackjack{ 21 };
 
-   inline std::mt19937 g_mt{ std::random_device{}() };
+    inline std::mt19937 g_mt{ std::random_device{}() };
 
-   class Card {
-    public:
-      Card(std::string_view f, std::string_view s);
+    class Card {
+     public:
+        Card(std::string_view face, std::string_view suit);
 
-      std::string_view face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
-      std::string_view suit;      // ♣♦♥♠ (purely aesthetic)
-      int value;  // from 1 to 10
+        std::string_view getFace() const;
+        std::string_view getSuit() const;
+        int Card::getValue() const;
 
-    private:
-      static const std::unordered_map<std::string_view, int> kFaceToValue;
-   };
+     private:
+        const std::unordered_map<std::string_view, int> kFaceToValue{
+            {"2",  2}, {"3",  3}, {"4", 4}, {"5",   5}, {"6",  6},
+            {"7",  7}, {"8",  8}, {"9", 9}, {"10", 10}, {"J", 10}, 
+            {"Q", 10}, {"K", 10}, {"A", 1}
+        };
 
-   class Deck {
-    public:
-      Deck();
+        std::string_view m_face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
+        std::string_view m_suit;      // ♣♦♥♠ (purely aesthetic)
+    };
 
-      Card takeCard();
-      bool needsShuffle() const;
-      void shuffle();
-      void showDeck() const; // debug
+    class Deck {
+     public:
+        Deck();
 
-    private:
-      static constexpr int kDeckSize{ 52 };
-      static constexpr int kMinDeckSizeBeforeRefill{ kDeckSize / 3 };
-      static constexpr std::array<std::string_view, 4> kSuit{ "♣", "♦", "♥", "♠" };
-      static constexpr std::array<std::string_view, 13> kSingleSuitFaces{
-         "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
-      };
+        Card takeCard();
+        bool needsShuffle() const;
+        void shuffle();
+        void showDeck() const; // debug
 
-      std::vector<Card> m_cards;
-   };
+     private:
+        static constexpr int kDeckSize{ 52 };
+        static constexpr int kMinDeckSizeBeforeRefill{ kDeckSize / 3 };
+        static constexpr std::array<std::string_view, 4> kSuit{ "♣", "♦", "♥", "♠" };
+        static constexpr std::array<std::string_view, 13> kSingleSuitFaces{
+            "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"
+        };
 
-   // abstract base class, objects are not allowed
-   class HandHolder {
-    public:
-      HandHolder();
-      virtual ~HandHolder(); // always include virtual destructor of a base polymorphic class
+        std::vector<Card> m_cards;
+    };
 
-      void startNewHand(Deck& deck);
-      int getTotalValue() const;
-      bool isFinished() const;
+    // abstract base class, objects are not allowed
+    class HandHolder {
+     public:
+        HandHolder();
+        virtual ~HandHolder(); // always include virtual destructor of a base polymorphic class
 
-    protected:
-      void hit(Deck& deck);
-      void stand();
+        void startNewHand(Deck& deck);
+        int getTotalValue() const;
+        bool isFinished() const;
 
-      std::vector<Card> m_hand;
-      bool m_finished;
+     protected:
+        void hit(Deck& deck);
+        void stand();
 
-    private:
-      bool hasAce() const;
-      void calculateTotalValue();
+        std::vector<Card> m_hand;
+        bool m_finished;
 
-      int m_total_value;
-   };
+     private:
+        bool hasAce() const;
+        void calculateTotalValue();
 
-   class Player : public HandHolder {
-    public:
-      Player();
-      
-      void processAction(char action, Deck& deck);
-      std::string getCardsString() const;
+        int m_total_value;
+    };
 
-      //std::vector<std::vector<Card>> additional_hands;
+    class Player : public HandHolder {
+     public:
+        Player();
 
-    private:
-      void doubleDown(Deck& deck);  // increase bet by 100% and take exactly one card, then stand
-      void split(); // split cards into two separate hands
+        void processAction(char action, Deck& deck);
+        const std::string& getCardsStr() const;
 
-      std::unordered_map<char, std::function<void(Deck&)>> m_action_map;
-   };
+        //std::vector<std::vector<Card>> additional_hands;
 
-   // stands on 17 and higher (no matter what)
-   class Dealer : public HandHolder {
-    public:
-      Dealer();
+     private:
+        void doubleDown(Deck& deck);  // increase bet by 100% and take exactly one card, then stand
+        void split(); // split cards into two separate hands
 
-      void playHand(int player_total, Deck& deck);
-      std::string getCardsString(bool player_turn_finished) const;
+        std::unordered_map<char, std::function<void(Deck&)>> m_action_map;
+    };
 
-    private:
-      static constexpr int kDealerStand{ 17 };
-   };
+    // stands on 17 and higher (no matter what)
+    class Dealer : public HandHolder {
+     public:
+        Dealer();
 
-   class Game {
-    public:
-      Game();
+        void playHand(int player_total, Deck& deck);
+        const std::string& getCardsStr(bool player_turn_finished) const;
 
-      void play();
+     private:
+        static constexpr int kDealerStand{ 17 };
+    };
 
-    private:
-      static constexpr std::string_view kPossibleActions{ "hsdp" };
-   
-      void clearTerminal() const;
-      void displayGameState() const;
-      bool isValidInput();
-      bool isValidAction(char action) const;
-      void handlePlayerInput();
-      void playerTurn();
-      void dealerTurn();
-      void decideWinner() const;
+    class Game {
+     public:
+        Game();
 
-      Deck m_deck;
-      Dealer m_dealer;
-      Player m_player;
-   };
+        void play();
+
+     private:
+        static constexpr std::string_view kPossibleActions{ "hsdp" };
+
+        void clearTerminal() const;
+        void displayGameState() const;
+        bool isValidInput();
+        bool isValidAction(char action) const;
+        void handlePlayerInput();
+        void playerTurn();
+        void dealerTurn();
+        void decideWinner() const;
+
+        Deck m_deck;
+        Dealer m_dealer;
+        Player m_player;
+    };
 }
