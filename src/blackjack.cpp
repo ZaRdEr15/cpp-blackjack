@@ -22,6 +22,12 @@ namespace Blackjack {
         return kFaceToValue.at(m_face);
     }
 
+    const std::unordered_map<std::string_view, int> Card::kFaceToValue{
+        {"2",  2}, {"3",  3}, {"4", 4}, {"5",   5}, {"6",  6},
+        {"7",  7}, {"8",  8}, {"9", 9}, {"10", 10}, {"J", 10}, 
+        {"Q", 10}, {"K", 10}, {"A", 1}
+    };
+
     Deck::Deck() {
         shuffle();
     }
@@ -101,25 +107,23 @@ namespace Blackjack {
     }
 
     Player::Player() : HandHolder{} {
-        // [=] capture by value captures '[this]'
-        m_action_map['h'] = [=](Deck& deck) { hit(deck); };
-        m_action_map['s'] = [=](Deck&) { stand(); };
-        m_action_map['d'] = [=](Deck& deck) { doubleDown(deck); };
-        m_action_map['p'] = [=](Deck&) { split(); };
+        m_action_map['h'] = [&](Deck& deck) { hit(deck); };
+        m_action_map['s'] = [&](Deck&) { stand(); };
+        m_action_map['d'] = [&](Deck& deck) { doubleDown(deck); };
+        m_action_map['p'] = [&](Deck&) { split(); };
     }
 
     void Player::processAction(char action, Deck& deck) {   
         m_action_map[action](deck);
     }
 
-    const std::string& Player::getCardsStr() const {
-        std::ostringstream ss;
-        ss << "Player hand (" << getTotalValue() << "): ";
-        for (const Card& card : m_hand) {
-            ss << card.getFace() << card.getSuit() << ' ';
+    std::ostream& operator<<(std::ostream& ostream, const Player& player) {
+        ostream << "Player hand (" << player.getTotalValue() << "): ";
+        for (const Card& card : player.m_hand) {
+            ostream << card.getFace() << card.getSuit() << ' ';
         }
-        ss << '\n';
-        return ss.str();
+        ostream << '\n';
+        return ostream;
     }
 
     void Player::doubleDown(Deck& deck) {
@@ -143,7 +147,7 @@ namespace Blackjack {
         }
     }
 
-    const std::string& Dealer::getCardsStr(bool player_turn_finished) const {
+    std::string Dealer::getCardsStr(bool player_turn_finished) const {
         std::ostringstream ss;
         if (!player_turn_finished) {
             ss << "Dealer hand: " << m_hand[0].getFace() << m_hand[0].getSuit() << " ▮\n";
@@ -184,7 +188,7 @@ namespace Blackjack {
 
     void Game::displayGameState() const {
         std::cout << m_dealer.getCardsStr(m_player.isFinished());
-        std::cout << m_player.getCardsStr();
+        std::cout << m_player;
     }
 
     bool Game::isValidInput() {

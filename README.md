@@ -5,8 +5,8 @@ Cross-platform (Linux, MacOS, Windows) Command line blackjack game built with C+
 ## Prerequisites
 
 - For compilation and linking: GCC version 9 and up
-- For build automation: CMake and Ninja
-- [CppUTest](https://cpputest.github.io/) (fetched using CMake)
+- For build automation: [CMake](https://cmake.org/) and [Ninja](https://github.com/ninja-build/ninja)
+- [CppUTest](https://cpputest.github.io/)
 
 ## Installation
 
@@ -42,7 +42,12 @@ Running the application choose any of the actions inside the parentheses (single
 
 To stop the application, press CTRL+C to kill the process.
 
+## Blackjack rules
+
+
+
 ## Roadmap
+- [ ] Add Blackjack simplified rules
 - [ ] Split into modular parts for easy readability
 - [ ] Make it possible to unit test functions but not break OOP principles
 - [ ] Show dealer single card value before reveal

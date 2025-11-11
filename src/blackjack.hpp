@@ -18,14 +18,10 @@ namespace Blackjack {
 
         std::string_view getFace() const;
         std::string_view getSuit() const;
-        int Card::getValue() const;
+        int getValue() const;
 
      private:
-        const std::unordered_map<std::string_view, int> kFaceToValue{
-            {"2",  2}, {"3",  3}, {"4", 4}, {"5",   5}, {"6",  6},
-            {"7",  7}, {"8",  8}, {"9", 9}, {"10", 10}, {"J", 10}, 
-            {"Q", 10}, {"K", 10}, {"A", 1}
-        };
+        static const std::unordered_map<std::string_view, int> kFaceToValue;
 
         std::string_view m_face;      // number or |K|ing, |Q|ueen, |J|ack, |A|ce
         std::string_view m_suit;      // ♣♦♥♠ (purely aesthetic)
@@ -80,7 +76,7 @@ namespace Blackjack {
         Player();
 
         void processAction(char action, Deck& deck);
-        const std::string& getCardsStr() const;
+        friend std::ostream& operator<<(std::ostream& ostream, const Player& player);
 
         //std::vector<std::vector<Card>> additional_hands;
 
@@ -97,7 +93,7 @@ namespace Blackjack {
         Dealer();
 
         void playHand(int player_total, Deck& deck);
-        const std::string& getCardsStr(bool player_turn_finished) const;
+        std::string getCardsStr(bool player_turn_finished) const;
 
      private:
         static constexpr int kDealerStand{ 17 };

@@ -23,14 +23,6 @@ target_link_options(blackjack PUBLIC
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
 
-    include(FetchContent)
-    FetchContent_Declare(
-        CppUTest
-        GIT_REPOSITORY https://github.com/cpputest/cpputest.git
-        GIT_TAG        master
-    )
-    FetchContent_MakeAvailable(CppUTest)
-
     enable_testing()
 
     add_executable(blackjack_tests tests/blackjack_unittest.cpp)
@@ -39,10 +31,12 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CMAKE_BUILD_TYPE STREQUAL "Mi
         -Wno-template-body
     )
 
+    find_package(CppUTest REQUIRED)
+
     target_link_libraries(blackjack_tests PRIVATE
         blackjack_core
-        CppUTest::CppUTest
-        CppUTest::CppUTestExt
+        CppUTest
+        CppUTestExt
     )
 
     add_test(NAME blackjack_tests COMMAND blackjack_tests)
