@@ -31,7 +31,14 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CMAKE_BUILD_TYPE STREQUAL "Mi
         -Wno-template-body
     )
 
-    find_package(CppUTest REQUIRED)
+    if(WIN32) # Windows (MSYS2)
+        find_package(CppUTest REQUIRED)
+    else() # Linux (Ubuntu/WSL) - Bypasses the broken find_package due to the bad config file  
+        target_include_directories(blackjack_tests PRIVATE 
+            /usr/include/CppUTest 
+            /usr/include/CppUTestExt
+        )
+    endif()
 
     target_link_libraries(blackjack_tests PRIVATE
         blackjack_core
