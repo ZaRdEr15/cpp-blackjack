@@ -4,9 +4,9 @@ Cross-platform (Linux, MacOS, Windows) Command line blackjack game built with C+
 
 ## Prerequisites
 
-- For compilation and linking: GCC version 9 and up
+- For C++17 compilation and linking: GCC version 9 and up
 - For build automation: [CMake](https://cmake.org/) and [Ninja](https://github.com/ninja-build/ninja)
-- [CppUTest](https://cpputest.github.io/)
+- For unit testing: [CppUTest](https://cpputest.github.io/)
 
 ## Installation
 
@@ -16,29 +16,26 @@ Cross-platform (Linux, MacOS, Windows) Command line blackjack game built with C+
 
 To build the application (builds tests also):
 ```
-mkdir build_debug
-cd build_debug
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
-ninja
+cmake -B build_debug -G Ninja --preset debug
+cmake --build build_debug
 ```
 
-To build for release (has no debug information):
+To build for release:
 ```
-mkdir build_release
-cd build_release
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
-ninja
+cmake -B build_release -G Ninja --preset release
+cmake --build build_release
 ```
 
 To run tests:
 ```
-cd build_debug
-ctest
+ctest --test-dir build_debug
 ```
 
 ## Usage
 
-Running the application choose any of the actions inside the parentheses (single character) and hit enter.
+Run **blackjack** application from either *build_debug* or *build_release*.
+
+Choose any of the actions inside the parentheses (single character) and hit enter.
 
 To stop the application, press CTRL+C to kill the process.
 

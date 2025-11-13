@@ -27,10 +27,6 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CMAKE_BUILD_TYPE STREQUAL "Mi
 
     add_executable(blackjack_tests tests/blackjack_unittest.cpp)
 
-    target_compile_options(blackjack_tests PRIVATE
-        -Wno-template-body
-    )
-
     if(WIN32) # Windows (MSYS2)
         find_package(CppUTest REQUIRED)
     else() # Linux (Ubuntu/WSL) - Bypasses the broken find_package due to the bad config file  
