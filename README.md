@@ -51,6 +51,7 @@ To stop the application, press CTRL+C to kill the process.
 - [ ] Add betting
 - [ ] Add split action
 - [ ] Add insurance (only if up card is an ace)
+- [ ] Add a graphical interface using raylib
 
 ## License
 Distributed under MIT License. See LICENSE for more information. 
