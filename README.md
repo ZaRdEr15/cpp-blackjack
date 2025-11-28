@@ -52,6 +52,8 @@ To stop the application, press CTRL+C to kill the process.
 - [ ] Add split action
 - [ ] Add insurance (only if up card is an ace)
 - [ ] Add a graphical interface using raylib
+- [ ] Add cross-platform build using GitHub Actions
+- [ ] Add releases to the GitHub repo
 
 ## License
 Distributed under MIT License. See LICENSE for more information. 
